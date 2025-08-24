@@ -6,7 +6,7 @@ using static Utilities.GameTime.TimeConversions;
 
 namespace Utilities.GameTime
 {
-    // Test
+    // Test commit
     public enum Season
     {
         Spring,
