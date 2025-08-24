@@ -7,7 +7,7 @@ namespace Utilities.GameTime
         
         public const int NUM_SECONDS_PER_MINUTE = 60;
         public const int NUM_SECONDS_PER_HOUR = NUM_SECONDS_PER_MINUTE * NUM_MINUTES_PER_HOUR;
-        public const int NUM_SECONDS_PER_DAY = NUM_MINUTES_PER_HOUR * NUM_HOURS_PER_DAY;
+        public const int NUM_SECONDS_PER_DAY = NUM_HOURS_PER_DAY * NUM_SECONDS_PER_HOUR;
         public const int NUM_MINUTES_PER_HOUR = 60;
         public const int NUM_MINUTES_PER_DAY = NUM_HOURS_PER_DAY * NUM_MINUTES_PER_HOUR;
         public const int NUM_HOURS_PER_DAY = 24;
@@ -40,6 +40,26 @@ namespace Utilities.GameTime
         public static float SecondsToHours(int seconds)
         {
             return (float)seconds / NUM_SECONDS_PER_HOUR;
+        }
+
+        public static int DaysToSeconds(int days)
+        {
+            return days * NUM_SECONDS_PER_DAY;
+        }
+
+        public static int Convert24HourTo12Hour(int hour)
+        {
+            if (hour == 0)
+            {
+                return 12;
+            }
+
+            if (hour > 12)
+            {
+                return hour - 12;
+            }
+
+            return hour;
         }
 
     }
