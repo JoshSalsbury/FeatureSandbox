@@ -1,0 +1,1 @@
+{"metadata":{"id":"abcd","name":"MyWorld","numSecondsPlayed":735.4149780273438},"playerData":{"name":"Josh","position":{"x":3.7870960235595705,"y":-1.9571306705474854,"z":0.0}},"calendarData":{"dayNumSecondsElapsed":735.4149780273438,"timeOfDay":"12:20 PM"}}
