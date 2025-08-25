@@ -30,6 +30,12 @@ namespace Utilities
             _modulus = modulus;
         }
 
+        public ModularInt(int value, int modulus, out int overflow)
+        {
+            _value = value.Mod(modulus, out overflow);
+            _modulus = modulus;
+        }
+
         public void Add(int value, out int overflow)
         {
             overflow = value - (value % _modulus);

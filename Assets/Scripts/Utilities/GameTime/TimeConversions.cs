@@ -11,6 +11,10 @@ namespace Utilities.GameTime
         public const int NUM_MINUTES_PER_HOUR = 60;
         public const int NUM_MINUTES_PER_DAY = NUM_HOURS_PER_DAY * NUM_MINUTES_PER_HOUR;
         public const int NUM_HOURS_PER_DAY = 24;
+        public const int NUM_DAYS_PER_WEEK = 7;
+        public const int NUM_DAYS_PER_SEASON = 28;
+        public const int NUM_DAYS_PER_YEAR = NUM_SEASONS_PER_YEAR * NUM_DAYS_PER_SEASON;
+        public const int NUM_SEASONS_PER_YEAR = 4;
 
         public static int SecondsToHours(int seconds, out int remainder)
         {

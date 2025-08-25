@@ -93,6 +93,11 @@ namespace Utilities.GameTime
     public partial struct TimeOnly
     {
         public static TimeOnly Zero = new(0);
+        public static TimeOnly OneHour = new(1, 0);
+        public static TimeOnly OneDay = new(1, 0, 0, 0);
+        public static TimeOnly OneWeek = NUM_DAYS_PER_WEEK * OneDay;
+        public static TimeOnly OneSeason = NUM_DAYS_PER_SEASON * OneDay;
+        public static TimeOnly OneYear = NUM_DAYS_PER_YEAR * OneDay;
     }
     
     // Override comparison and arithmetic operators
@@ -150,6 +155,18 @@ namespace Utilities.GameTime
         
         public static TimeOnly operator -(int seconds, TimeOnly timeOnly)
             => new(seconds - timeOnly.ToSeconds());
+
+        public static TimeOnly operator *(TimeOnly timeOnly, float value)
+            => new(timeOnly.ToSeconds() * value);
+        
+        public static TimeOnly operator *(float value, TimeOnly timeOnly)
+            => timeOnly * value;
+        
+        public static TimeOnly operator *(TimeOnly timeOnly, int value)
+            => new(timeOnly.ToSeconds() * value);
+
+        public static TimeOnly operator *(int value, TimeOnly timeOnly)
+            => timeOnly * value;
 
     }
     

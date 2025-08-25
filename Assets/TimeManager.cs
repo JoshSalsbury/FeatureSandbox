@@ -7,6 +7,13 @@ using static Utilities.GameTime.TimeConversions;
 public class TimeManager : MonoBehaviour
 {
 
+    public event EventHandler<OnDateChangedEventArgs> OnDateChanged;
+
+    public class OnDateChangedEventArgs : EventArgs
+    {
+        public DateOnly Date;
+    }
+
     public event EventHandler<OnTimeChangedEventArgs> OnTimeChanged;
 
     public class OnTimeChangedEventArgs : EventArgs
@@ -27,6 +34,16 @@ public class TimeManager : MonoBehaviour
             OnTimeChanged?.Invoke(this, new OnTimeChangedEventArgs { Time = value });
         }
     }
+
+    public DateOnly CurrentDate
+    {
+        get => _currentDate;
+        private set
+        {
+            _currentDate = value;
+            OnDateChanged?.Invoke(this, new OnDateChangedEventArgs { Date = value });
+        }
+    }
     
     [SerializeField] private bool is24HourTime;
     [SerializeField] private int gameDayDurationInRealWorldMinutes;
@@ -44,6 +61,7 @@ public class TimeManager : MonoBehaviour
 
     private TimeOnly _backingTime = new(0);
     private TimeOnly _currentTime = new(0);
+    private DateOnly _currentDate = new(2077, Season.Fall, 0);
 
     private void Awake()
     {
@@ -72,10 +90,15 @@ public class TimeManager : MonoBehaviour
 
     private void TimeManager_OnBackingTimeChanged(object sender, EventArgs e)
     {
-        if (!BackingTime.IsHourAndMinuteEqual(CurrentTime))
+        if (BackingTime.ClockEquals(CurrentTime))
         {
-            CurrentTime = BackingTime;
+            return;
         }
+        if (BackingTime.Day != CurrentTime.Day)
+        {
+            CurrentDate = CurrentDate.IncrementDay();
+        }
+        CurrentTime = BackingTime;
     }
     
 }

@@ -1,6 +1,8 @@
 using System;
 using Extensions;
 using JetBrains.Annotations;
+using UnityEngine;
+using static Utilities.GameTime.TimeConversions;
 
 namespace Utilities.GameTime
 {
@@ -13,9 +15,11 @@ namespace Utilities.GameTime
 
         public DateOnly(int year, Season season, int day)
         {
-            Year = year;
-            Season = season;
-            Day = new ModularInt(day, 28);
+            Day = new ModularInt(day, NUM_DAYS_PER_SEASON, out int overflow);
+            int numExcessYears = Math.DivRem(overflow, NUM_DAYS_PER_YEAR, out int remainder);
+            int numExcessSeasons = remainder / NUM_DAYS_PER_SEASON;
+            Season = (Season)((int)season + numExcessSeasons).Mod(NUM_SEASONS_PER_YEAR, out int seasonOverflow);
+            Year = year + numExcessYears + (seasonOverflow / NUM_SEASONS_PER_YEAR);
         }
 
         public bool IsBetween(DateOnly left, DateOnly right)
@@ -88,6 +92,11 @@ namespace Utilities.GameTime
             return IsSaturday() || IsSunday();
         }
 
+        public DateOnly IncrementDay()
+        {
+            return new DateOnly(Year, Season, Day.Value + 1);
+        }
+
         public DayOfWeek GetDayOfWeek()
         {
             int day = Day.Value.Mod(7);
@@ -96,6 +105,11 @@ namespace Utilities.GameTime
                 throw new ArgumentOutOfRangeException("day");
             }
             return (DayOfWeek)day;
+        }
+
+        public string GetDateAsString()
+        {
+            return $"{Day.Value+1} {Season}, {Year}";
         }
 
     }
@@ -138,6 +152,19 @@ namespace Utilities.GameTime
         public static bool operator >=(DateOnly left, DateOnly right) => !(left < right);
 
         public static bool operator <=(DateOnly left, DateOnly right) => !(left > right);
+
+        public static DateOnly operator +(DateOnly dateOnly, int days)
+            => new(dateOnly.Year, dateOnly.Season, dateOnly.Day.Value + days);
+        
+        public static DateOnly operator +(int days, DateOnly dateOnly)
+            => dateOnly + days;
+
+        public static DateOnly operator +(DateOnly dateOnly, TimeOnly timeOnly)
+            => dateOnly + timeOnly.Day;
+        
+        public static DateOnly operator +(TimeOnly timeOnly, DateOnly dateOnly)
+            => dateOnly + timeOnly;
+
     }
     
 }
