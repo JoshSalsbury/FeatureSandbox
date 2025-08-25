@@ -7,6 +7,13 @@ using static Utilities.GameTime.TimeConversions;
 public class TimeManager : MonoBehaviour
 {
 
+    public event EventHandler<OnDateChangedEventArgs> OnDateChanged;
+
+    public class OnDateChangedEventArgs : EventArgs
+    {
+        public DateOnly Date;
+    }
+
     public event EventHandler<OnTimeChangedEventArgs> OnTimeChanged;
 
     public class OnTimeChangedEventArgs : EventArgs
@@ -14,7 +21,7 @@ public class TimeManager : MonoBehaviour
         public TimeOnly Time;
     }
 
-    private event EventHandler OnEpochTimeChanged;
+    private event EventHandler OnBackingTimeChanged;
     
     public static TimeManager Instance;
 
@@ -27,23 +34,34 @@ public class TimeManager : MonoBehaviour
             OnTimeChanged?.Invoke(this, new OnTimeChangedEventArgs { Time = value });
         }
     }
+
+    public DateOnly CurrentDate
+    {
+        get => _currentDate;
+        private set
+        {
+            _currentDate = value;
+            OnDateChanged?.Invoke(this, new OnDateChangedEventArgs { Date = value });
+        }
+    }
     
     [SerializeField] private bool is24HourTime;
     [SerializeField] private int gameDayDurationInRealWorldMinutes;
     [SerializeField] private float playerTimeScalePreference = 1f;
 
-    private float EpochTime
+    private TimeOnly BackingTime
     {
-        get => _epochTime;
+        get => _backingTime;
         set
         {
-            _epochTime = value;
-            OnEpochTimeChanged?.Invoke(this, EventArgs.Empty);
+            _backingTime = value;
+            OnBackingTimeChanged?.Invoke(this, new OnTimeChangedEventArgs { Time = value });
         }
     }
-    
-    private float _epochTime;
-    private TimeOnly _currentTime = new(0, 0);
+
+    private TimeOnly _backingTime = new(0);
+    private TimeOnly _currentTime = new(0);
+    private DateOnly _currentDate = new(2077, Season.Fall, 0);
 
     private void Awake()
     {
@@ -52,12 +70,12 @@ public class TimeManager : MonoBehaviour
 
     private void Start()
     {
-        OnEpochTimeChanged += TimeManager_OnEpochTimeChanged;
+        OnBackingTimeChanged += TimeManager_OnBackingTimeChanged;
     }
 
     private void Update()
     {
-        EpochTime += GetTimeScale() * Time.deltaTime;
+        BackingTime += GetTimeScale() * Time.deltaTime;
     }
 
     public bool Is24HourTime()
@@ -70,13 +88,17 @@ public class TimeManager : MonoBehaviour
         return playerTimeScalePreference * ((float)NUM_MINUTES_PER_DAY / gameDayDurationInRealWorldMinutes);
     }
 
-    private void TimeManager_OnEpochTimeChanged(object sender, EventArgs e)
+    private void TimeManager_OnBackingTimeChanged(object sender, EventArgs e)
     {
-        TimeOnly newTime = new(_epochTime);
-        if (!newTime.IsHourAndMinuteEqual(_currentTime))
+        if (BackingTime.ClockEquals(CurrentTime))
         {
-            CurrentTime = newTime;
+            return;
         }
+        if (BackingTime.Day != CurrentTime.Day)
+        {
+            CurrentDate = CurrentDate.IncrementDay();
+        }
+        CurrentTime = BackingTime;
     }
     
 }
